@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "juniorvacanciesscanner"
+version = "0.1.0"
+description = ""
+authors = ["a.cheremushkin <a.ch3re359@yandex.ru>"]
+readme = "README.md"
+packages = [
+  { include = "jun_jobs_bot" },
+]
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+sqlalchemy = "^1.4.42"
+aiogram = "^2.22.2"
+coverage = "^6.5.0"
+flake8 = "^5.0.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+page-loader = "jun_jobs_bot.scripts.bot_script:main"
