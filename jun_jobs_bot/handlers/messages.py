@@ -12,16 +12,6 @@ class MessageReply:
            '/start\n' \
            '/info'
 
-    START = 'Choose your language:\n' \
-            '/Python\n' \
-            '/Java\n' \
-            '/Php\n' \
-            '/JavaScript\n' \
-            '/Ruby'
-    COMPARE = 'Choose a comparison format:\n' \
-              '/RightNow\n'\
-              '/perWeek\n' \
-              '/perMonth\n' \
-              '/per3Month\n' \
-              '/per6Month\n' \
-              '/perYear'
+    START = 'Select a programming language'
+    COMPARE = 'Select the type of comparison'
+    ADMIN_START = 'Make a general request?'
