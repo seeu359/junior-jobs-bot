@@ -4,6 +4,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from jun_jobs_bot.handlers.messages import MessageReply
 from jun_jobs_bot.handlers.buttons import get_admin_buttons
 from aiogram.dispatcher import FSMContext
+from jun_jobs_bot.logic.admin_requests import Requester
 
 
 class Request(StatesGroup):
@@ -23,7 +24,8 @@ async def get_result(message: types.Message, state: FSMContext):
         await message.answer('Ok')
         await state.finish()
     else:
-        await message.answer('Completed')
+        m = Requester().upload_to_db()
+        await message.answer(m)
         await state.finish()
 
 

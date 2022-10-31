@@ -9,7 +9,7 @@ install-venv:
 	python3 -m pip install --force-reinstall dist/*.whl
 
 lint:
-	poetry run flake8 page_loader
+	poetry run flake8 jun_jobs_bot
 pyt:
 	poetry run pytest tests
 test-coverage:

@@ -5,6 +5,7 @@ from jun_jobs_bot.handlers.messages import MessageReply
 from jun_jobs_bot.handlers import buttons
 from jun_jobs_bot.logic import user_requests, exceptions
 
+
 class Condition(StatesGroup):
     language = State()
     compare_type = State()
