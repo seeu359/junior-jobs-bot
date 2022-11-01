@@ -3,3 +3,4 @@
 .idea
 *.sqlite
 __pycache__
+Procfile
