@@ -40,13 +40,15 @@ class Statistics:
             return f'{self.language} vacancies at the moment: {data.vacancies}'
 
     def get_week_stat(self) -> str:
-        week_ago = self.today - timedelta(days=7)
+        week_ago = self.today - timedelta(days=1) #Test case. Need changes days in timedalta.
         with session() as s:
-            data = s.query(
-                Requests).filter((Requests.date > week_ago) &
-                                 (Requests.date <= self.today) &
-                                 (Requests.date == self.language_id)).all()
-            result = self.count_week_stat(data)
+            week_ago = s.query(Requests).filter((Requests.date == week_ago) &
+                                                (Requests.language_id ==
+                                                 self.language_id)).first()
+            now = s.query(Requests).filter((Requests.date == self.today) &
+                                           (Requests.language_id ==
+                                            self.language_id)).first()
+            result = self.count_week_stat(week_ago, now)
             return result
 
     def get_month_stat(self):
@@ -61,9 +63,7 @@ class Statistics:
     def get_year_stat(self):
         return f'Заглушка 365'
 
-    def count_week_stat(self, data: list[Requests]) -> str:
-        data.sort(key=lambda x: x.date)
-        week_ago, now = data[0], data[1]
+    def count_week_stat(self, week_ago: Requests, now: Requests) -> str:
         result = round(now.vacancies / week_ago.vacancies *
                        COEFFICIENT - COEFFICIENT)
         if result < 0:
