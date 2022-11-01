@@ -1,11 +1,15 @@
 from jun_jobs_bot.logic.exceptions import NotCorrectMessage
-from jun_jobs_bot.logic.dataclasses import languages, compare_type
+from jun_jobs_bot.logic.dataclasses import languages, compare_type, languages_id
 from datetime import date, timedelta
 from jun_jobs_bot.models import Requests, session
-from jun_jobs_bot.logic.admin_requests import languages_id
 
 
 COEFFICIENT = 100
+WEEK = 7
+MONTH = 30
+THREE_MONTH = 90
+SIX_MONTH = 180
+YEAR = 365
 
 
 def process_request(request: dict[str, str]) -> str:
@@ -13,18 +17,21 @@ def process_request(request: dict[str, str]) -> str:
     ct_handling = _compare_type.lower().replace(' ', '')
     lang_id = languages_id[_language.lower()]
     stat = Statistics(_language, lang_id)
-    handler = {'rightnow': stat.get_today_stat(),
-               'perweek': stat.get_week_stat(),
-               'permonth': stat.get_month_stat(),
-               'per3month': stat.get_three_month_stat(),
-               'per6month': stat.get_six_month_stat(),
-               'peryear': stat.get_year_stat(),
-               }
-    data = handler[ct_handling]
+    if ct_handling == compare_type.right_now:
+        data = stat.get_today_stat()
+    else:
+        data = stat.get_stats(ct_handling)
     return data
 
 
 class Statistics:
+
+    _days = {'perweek': WEEK,
+             'permonth': MONTH,
+             'per3month': THREE_MONTH,
+             'per6month': SIX_MONTH,
+             'peryear': YEAR,
+             }
 
     def __init__(self, language: str, language_id: int):
         self.language = language
@@ -39,32 +46,21 @@ class Statistics:
                                           == self.language_id)).first()
             return f'{self.language} vacancies at the moment: {data.vacancies}'
 
-    def get_week_stat(self) -> str:
-        week_ago = self.today - timedelta(days=1) #Test case. Need changes days in timedalta.
+    def get_stats(self, _compare_type: str) -> str:
+        days = self._days[_compare_type]
+        days_diff = self.today - timedelta(days=1)
         with session() as s:
-            week_ago = s.query(Requests).filter((Requests.date == week_ago) &
-                                                (Requests.language_id ==
+            past_time = s.query(Requests).filter((Requests.date == days_diff) &
+                                                 (Requests.language_id ==
                                                  self.language_id)).first()
             now = s.query(Requests).filter((Requests.date == self.today) &
                                            (Requests.language_id ==
                                             self.language_id)).first()
-            result = self.count_week_stat(week_ago, now)
+            result = self.count_stats(past_time, now)
             return result
 
-    def get_month_stat(self):
-        return f'Заглушка 30'
-
-    def get_three_month_stat(self):
-        return f'Заглушка 90'
-
-    def get_six_month_stat(self):
-        return f'Заглушка 180'
-
-    def get_year_stat(self):
-        return f'Заглушка 365'
-
-    def count_week_stat(self, week_ago: Requests, now: Requests) -> str:
-        result = round(now.vacancies / week_ago.vacancies *
+    def count_stats(self, past_time: Requests, now: Requests) -> str:
+        result = round(now.vacancies / past_time.vacancies *
                        COEFFICIENT - COEFFICIENT)
         if result < 0:
             return f'The number of {self.language} jobs decreased by ' \
