@@ -4,7 +4,8 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 from jun_jobs_bot.handlers.messages import MessageReply
 from jun_jobs_bot.handlers.buttons import get_admin_buttons
 from aiogram.dispatcher import FSMContext
-from jun_jobs_bot.logic.admin_requests import Requester
+from jun_jobs_bot.logic.admin_requests import check_db_record
+from aiogram.types import ReplyKeyboardRemove
 
 
 class Request(StatesGroup):
@@ -21,11 +22,11 @@ async def choose_lang(message: types.Message):
 async def get_result(message: types.Message, state: FSMContext):
     await state.update_data(all=message.text)
     if message.text == 'No':
-        await message.answer('Ok')
+        await message.answer('Ok', reply_markup=ReplyKeyboardRemove())
         await state.finish()
     else:
-        m = Requester().upload_to_db()
-        await message.answer(m)
+        m = check_db_record()
+        await message.answer(m, reply_markup=ReplyKeyboardRemove())
         await state.finish()
 
 

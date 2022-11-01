@@ -3,7 +3,6 @@ from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from jun_jobs_bot.settings import PATH_TO_BASE
 
-
 engine = create_engine(f'sqlite:///{PATH_TO_BASE}', echo=True)
 
 session = sessionmaker(engine)
