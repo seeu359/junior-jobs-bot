@@ -1,11 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
-from jun_jobs_bot.settings import DB_USERNAME, DB_PASSWORD, \
-    HOST, PORT, DATABASE
+from jun_jobs_bot.settings import CONNECT
 
-engine = create_engine('postgresql+psycopg2://' + DB_USERNAME + ':' +
-                       DB_PASSWORD + '@' + HOST + ':' + PORT + '/' + DATABASE)
+engine = create_engine(CONNECT)
 
 session = sessionmaker(engine)
 
