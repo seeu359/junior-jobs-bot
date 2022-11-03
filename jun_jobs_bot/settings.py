@@ -9,3 +9,4 @@ DB_PASSWORD = os.environ['DB_PASSWORD']
 HOST = os.environ['HOST']
 PORT = os.environ['PORT']
 DATABASE = os.environ['DATABASE']
+print(DATABASE)
