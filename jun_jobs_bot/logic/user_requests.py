@@ -1,5 +1,6 @@
 from jun_jobs_bot.logic.exceptions import NotCorrectMessage
-from jun_jobs_bot.logic.dataclasses import languages, compare_type, languages_id
+from jun_jobs_bot.logic.dataclasses import languages, compare_type, \
+    languages_id
 from datetime import date, timedelta
 from jun_jobs_bot.models import Requests, session
 
@@ -48,7 +49,7 @@ class Statistics:
 
     def get_stats(self, _compare_type: str) -> str:
         days = self._days[_compare_type]
-        days_diff = self.today - timedelta(days=1)
+        days_diff = self.today - timedelta(days=3)
         with session() as s:
             past_time = s.query(Requests).filter((Requests.date == days_diff) &
                                                  (Requests.language_id ==
@@ -69,7 +70,7 @@ class Statistics:
             return f'The number of {self.language} vacancies has ' \
                    f'increased by {result}%'
         else:
-            return f'The number of vacancies has not changed'
+            return 'The number of vacancies has not changed'
 
 
 def validate_data(data: dict[str, str]) -> None:
