@@ -4,7 +4,10 @@ from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from jun_jobs_bot.settings import DB_USERNAME, DB_PASSWORD, \
     HOST, PORT, DATABASE
 
-engine = create_engine('postgresql+psycopg2://zrccggtqrkphaw:02a4d05dff7828f2c829633feeab670259f29a8b23022c73e7ab3f7e78fb3edf@ec2-44-199-22-207.compute-1.amazonaws.com:5432/d910mafk2ua9b8')
+engine = create_engine('postgresql+psycopg2://%s:%s@%s:%s/%s' % (DB_USERNAME,
+                                                                 DB_PASSWORD,
+                                                                 HOST, PORT,
+                                                                 DATABASE))
 
 session = sessionmaker(engine)
 
