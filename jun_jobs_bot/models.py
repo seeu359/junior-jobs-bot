@@ -1,19 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
-import os
+from jun_jobs_bot.settings import DB_CONNECT
 
-DB_USERNAME = os.environ['DB_USERNAME']
-DB_PASSWORD = os.environ['DB_PASSWORD']
-HOST = os.environ['HOST']
-PORT = os.environ['PORT']
-DATABASE = os.environ['DATABASE']
-
-CONNECT = 'postgresql://%s:%s@%s:%s/%s' % (DB_USERNAME, DB_PASSWORD,
-                                           HOST, PORT,
-                                           DATABASE)
-
-engine = create_engine(CONNECT)
+engine = create_engine(DB_CONNECT)
 
 session = sessionmaker(engine)
 
