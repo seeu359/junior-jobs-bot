@@ -3,3 +3,4 @@
 .idea
 __pycache__
 *.sqlite
+.pytest_cache

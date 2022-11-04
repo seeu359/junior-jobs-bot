@@ -12,13 +12,13 @@ class Condition(StatesGroup):
     compare_type = State()
 
 
-async def choose_lang(message: types.Message):
+async def get_language(message: types.Message):
     kb_client = buttons.get_lang_buttons()
-    await message.reply(MessageReply.START, reply_markup=kb_client)
+    await message.reply(MessageReply.SELECT_LANG, reply_markup=kb_client)
     await Condition.language.set()
 
 
-async def choose_format(message: types.Message, state: FSMContext):
+async def get_compare_type(message: types.Message, state: FSMContext):
     kb_client = buttons.get_stats_buttons()
     await state.update_data(language=message.text)
     await message.answer(MessageReply.COMPARE, reply_markup=kb_client)
@@ -40,6 +40,6 @@ async def get_result(message: types.Message, state: FSMContext):
 
 
 def register_primary_handlers(dp: Dispatcher):
-    dp.register_message_handler(choose_lang, commands=['start'], state=None)
-    dp.register_message_handler(choose_format, state=Condition.language)
+    dp.register_message_handler(get_language, commands=['start'], state=None)
+    dp.register_message_handler(get_compare_type, state=Condition.language)
     dp.register_message_handler(get_result, state=Condition.compare_type)

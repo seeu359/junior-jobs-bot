@@ -1,9 +1,17 @@
 from datetime import date
-from jun_jobs_bot.logic.user_requests import languages
-from jun_jobs_bot.logic.dataclasses import languages_id, region_id
+from jun_jobs_bot.logic.dataclasses import languages_id, region_id, \
+    languages, Languages
+from requests.exceptions import RequestException, HTTPError, URLRequired, \
+    TooManyRedirects, Timeout
+from jun_jobs_bot.logic.exceptions import DataDownloadError
 from jun_jobs_bot import models
+from loguru import logger
 import requests
 import json
+
+
+COMPLETED = 'Completed!'
+REQUEST_BEEN_MADE = 'The request has already been made today!'
 
 
 def check_db_record():
@@ -11,7 +19,8 @@ def check_db_record():
         check = s.query(models.Requests).filter(models.Requests.date ==
                                                 date.today()).first()
         if check is not None:
-            return 'The request has already been made today!'
+            logger.info('The request has already been made today!')
+            return REQUEST_BEEN_MADE
         upload = Requester()
         message = upload.upload_to_db()
         return message
@@ -20,14 +29,19 @@ def check_db_record():
 class Requester:
 
     def __init__(self):
-        self.languages = languages
+        self.languages: Languages = languages
 
     def _get_data(self) -> dict[str, int]:
         result = dict()
         for lang in self.languages:
             template = f'https://api.hh.ru/vacancies?text={lang}+junior' \
                        f'&per_page=100&area=113'
-            data = json.loads(requests.get(template).text)
+            try:
+                data = json.loads(requests.get(template).text)
+            except (ConnectionError, RequestException, HTTPError,
+                    URLRequired, TooManyRedirects, Timeout) as e:
+                logger.error(f'Request error: {e}')
+                raise DataDownloadError(str(e))
             result[lang]: int = data['found']
         return result
 
@@ -40,6 +54,8 @@ class Requester:
                                          region_id=region_id['Russia'],
                                          vacancies=value,
                                          date=_date)
+                logger.debug(f'Record has been added in db!')
                 s.add(record)
             s.commit()
-            return 'Completed'
+            logger.info('Data was added successfully.!')
+            return COMPLETED

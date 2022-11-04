@@ -12,6 +12,6 @@ class MessageReply:
            '/start\n' \
            '/info'
 
-    START = 'Select a programming language'
+    SELECT_LANG = 'Select a programming language'
     COMPARE = 'Select the type of comparison'
     ADMIN_START = 'Make a general request?'

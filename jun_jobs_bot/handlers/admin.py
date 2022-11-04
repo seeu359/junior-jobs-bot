@@ -6,6 +6,7 @@ from jun_jobs_bot.handlers.buttons import get_admin_buttons
 from aiogram.dispatcher import FSMContext
 from jun_jobs_bot.logic.admin_requests import check_db_record
 from aiogram.types import ReplyKeyboardRemove
+from loguru import logger
 
 
 class Request(StatesGroup):
