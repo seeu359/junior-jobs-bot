@@ -1,12 +1,11 @@
 from aiogram import Dispatcher, types
 from jun_jobs_bot.settings import ADMIN_ID
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from jun_jobs_bot.handlers.messages import MessageReply
+from jun_jobs_bot.messages import MessageReply
 from jun_jobs_bot.handlers.buttons import get_admin_buttons
 from aiogram.dispatcher import FSMContext
-from jun_jobs_bot.logic.admin_requests import check_db_record
+from jun_jobs_bot.logic.db_work import DatabaseWorker
 from aiogram.types import ReplyKeyboardRemove
-from loguru import logger
 
 
 class Request(StatesGroup):
@@ -25,10 +24,16 @@ async def get_result(message: types.Message, state: FSMContext):
     if message.text == 'No':
         await message.answer('Ok', reply_markup=ReplyKeyboardRemove())
         await state.finish()
-    else:
-        m = check_db_record()
-        await message.answer(m, reply_markup=ReplyKeyboardRemove())
-        await state.finish()
+    elif message.text == 'Yes':
+        db_worker = DatabaseWorker()
+        if db_worker.check_db_record():
+            await message.answer(MessageReply.REQUEST_MADE,
+                                 reply_markup=ReplyKeyboardRemove())
+            await state.finish()
+        else:
+            await message.answer(MessageReply.DATA_DOWNLOADED_SUCCESS,
+                                 reply_markup=ReplyKeyboardRemove())
+            await state.finish()
 
 
 def register_admin_handlers(dp: Dispatcher):

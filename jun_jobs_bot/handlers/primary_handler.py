@@ -1,10 +1,10 @@
 from aiogram import Dispatcher, types
-from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.dispatcher import FSMContext
-from jun_jobs_bot.handlers.messages import MessageReply
+from jun_jobs_bot.messages import MessageReply
 from jun_jobs_bot.handlers import buttons
-from jun_jobs_bot.logic import user_requests, exceptions
+from jun_jobs_bot.logic import statistics, exceptions
 from aiogram.types import ReplyKeyboardRemove
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class Condition(StatesGroup):
@@ -29,12 +29,12 @@ async def get_result(message: types.Message, state: FSMContext):
     await state.update_data(compare_type=message.text)
     data = await state.get_data()
     try:
-        user_requests.validate_data(data)
+        statistics.validate_data(data)
     except exceptions.NotCorrectMessage as e:
         await message.answer(str(e), reply_markup=ReplyKeyboardRemove())
         await state.finish()
     else:
-        answer = user_requests.process_request(data)
+        answer = statistics.process_request(data)
         await message.answer(answer, reply_markup=ReplyKeyboardRemove())
         await state.finish()
 

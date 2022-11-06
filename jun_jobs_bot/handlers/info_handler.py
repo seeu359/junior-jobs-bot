@@ -1,5 +1,5 @@
 from aiogram import types, Dispatcher
-from jun_jobs_bot.handlers.messages import MessageReply
+from jun_jobs_bot.messages import MessageReply
 
 
 async def get_info(message: types.Message):
