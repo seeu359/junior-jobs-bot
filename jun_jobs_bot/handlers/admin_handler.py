@@ -31,6 +31,7 @@ async def get_result(message: types.Message, state: FSMContext):
                                  reply_markup=ReplyKeyboardRemove())
             await state.finish()
         else:
+            db_worker.upload_to_db()
             await message.answer(MessageReply.DATA_DOWNLOADED_SUCCESS,
                                  reply_markup=ReplyKeyboardRemove())
             await state.finish()
