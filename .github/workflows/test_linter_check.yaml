@@ -4,10 +4,6 @@ on:
   - push
   - pull_request
 
-env:
-    DB_CONNECT: DB_CONNECT
-    TG_TOKEN: TG_TOKEN
-    ADMIN_ID: ADMIN_ID
 
 jobs:
   build:
