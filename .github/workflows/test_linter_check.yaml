@@ -5,8 +5,9 @@ on:
   - pull_request
 
 env:
-    TG_TOKEN: TG_TOKEN
-    ADMIN_ID: ADMIN_ID
+    DB_CONNECT: ${{ env.DB_CONNECT }}
+    TG_TOKEN: ${{ env.TG_TOKEN }}
+    ADMIN_ID: ${{ env.ADMIN_ID }}
 
 jobs:
   build:
