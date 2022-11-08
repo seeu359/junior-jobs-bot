@@ -1,5 +1,4 @@
 import unittest
-
 import pytest
 import requests_mock
 from jun_jobs_bot import messages
@@ -9,8 +8,6 @@ from jun_jobs_bot.logic.db_work import _get_data
 from aiogram_unittest.handler import MessageHandler
 from aiogram_unittest.types.dataset import MESSAGE
 from jun_jobs_bot.logic.statistics import validate_data
-from aiogram_unittest.handler import CallbackQueryHandler
-from aiogram_unittest.types.dataset import CALLBACK_QUERY
 from jun_jobs_bot.handlers.info_handler import get_info, get_help
 from jun_jobs_bot.handlers.primary_handler import get_language, \
     get_compare_type, Condition
@@ -23,7 +20,7 @@ from jun_jobs_bot.handlers.primary_handler import get_language, \
                             'compare_type': 'Wrong Type'})
                           ])
 def test_validate_data1(data):
-    with pytest.raises(exceptions.NotCorrectMessage):
+    with pytest.raises(exceptions.NotCorrectData):
         validate_data(data)
 
 
@@ -43,8 +40,8 @@ def test_get_data():
                  f'&per_page=100&area=113', text=test_data)
         tested_func = _get_data()
         assert len(tested_func) == 5
-        assert tested_func['python'] == test_key
-        assert tested_func['ruby'] == test_key
+        assert tested_func['python'] == (test_key, test_key)
+        assert tested_func['ruby'] == (test_key, test_key)
 
 
 class TestBot(unittest.IsolatedAsyncioTestCase):

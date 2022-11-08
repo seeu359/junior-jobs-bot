@@ -1,29 +1,28 @@
 from datetime import date, timedelta
-from jun_jobs_bot.logic.dataclasses import languages_id, region_id, languages
+from jun_jobs_bot.logic.dataclasses import LANGUAGES_ID, AvailableRegions, \
+    AVAILABLE_LANGUAGES, CONSTANTS
 from requests.exceptions import RequestException, HTTPError, URLRequired, \
     TooManyRedirects, Timeout
 from jun_jobs_bot.logic.exceptions import DataDownloadError
 from jun_jobs_bot import models
 from loguru import logger
+from string import Template
 import requests
 import json
 
+ALL_VACANCIES_URL_TEMPLATE = Template(
+        'https://api.hh.ru/vacancies?'
+        'text=$language+junior&per_page=100&area=$area_id'
+)
 
-COEFFICIENT = 100
-WEEK = 7
-MONTH = 30
-THREE_MONTH = 90
-SIX_MONTH = 180
-YEAR = 365
+NO_EXPERIENCE_URL_TEMPLATE = Template(
+        'https://api.hh.ru/vacancies?'
+        'text=$language+junior&per_page=100&'
+        'area=$area_id&experience=noExperience'
+)
 
 
 class DatabaseWorker:
-    _days = {'perweek': WEEK,
-             'permonth': MONTH,
-             'per3month': THREE_MONTH,
-             'per6month': SIX_MONTH,
-             'peryear': YEAR,
-             }
 
     def __init__(self):
         self.model = models.Statistics
@@ -38,16 +37,22 @@ class DatabaseWorker:
             self, compare_type: str, language_id: int) -> \
             tuple[models.Statistics, models.Statistics]:
 
-        days_diff = date.today() - timedelta(days=6)
+        days_diff = date.today() - timedelta(days=CONSTANTS['perweek'])
         with models.session() as s:
 
             past_time = s.query(self.model).filter(
                 (self.model.date == days_diff) &
                 (self.model.language_id == language_id)).first()
+            logger.info(f'Past time: '
+                        f'Lang id: {past_time.language_id}, '
+                        f'Vacancies: {past_time.vacancies}')
 
             today = s.query(self.model).filter(
                 (self.model.date == date.today()) &
                 (self.model.language_id == language_id)).first()
+            logger.info(f'Today: '
+                        f'Lang id: {today.language_id}, '
+                        f'Vacancies: {today.vacancies}')
         return past_time, today
 
     def check_db_record(self) -> bool:
@@ -62,28 +67,44 @@ class DatabaseWorker:
         with models.session() as s:
             data = _get_data()
             for key, value in data.items():
-                record = self.model(language_id=languages_id[key],
-                                    region_id=region_id['Russia'],
-                                    vacancies=value,
-                                    date=date.today())
+                record = self.model(
+                    language_id=LANGUAGES_ID[key],
+                    region_id=AvailableRegions.Russia,
+                    vacancies=value[0],
+                    date=date.today(),
+                    no_experience=value[1]
+                    )
 
                 logger.debug('Record has been added in db!')
                 s.add(record)
             s.commit()
 
 
-def _get_data() -> dict[str, int]:
+def _get_data() -> dict[str, tuple[int, int]]:
     data = dict()
-    for language in languages:
-        template = f'https://api.hh.ru/vacancies?text={language}+junior' \
-                   f'&per_page=100&area=113'
+    for language in AVAILABLE_LANGUAGES:
+
+        all_vacancies_url = ALL_VACANCIES_URL_TEMPLATE.substitute(
+           language=language,
+           area_id=AvailableRegions.Russia,
+        )
+
+        no_experience_url = NO_EXPERIENCE_URL_TEMPLATE.substitute(
+            language=language,
+            area_id=AvailableRegions.Russia,
+        )
 
         try:
-            request = json.loads(requests.get(template).text)
+            all_vacancies_query = json.loads(
+                requests.get(all_vacancies_url).text)
+            no_experience_query = json.loads(
+                requests.get(no_experience_url).text)
         except (ConnectionError, RequestException, HTTPError,
                 URLRequired, TooManyRedirects, Timeout) as e:
             logger.error(f'Request error: {e}')
             raise DataDownloadError(str(e))
 
-        data[language]: int = request['found']
+        data[language]: tuple[int, int] = (
+            all_vacancies_query['found'], no_experience_query['found']
+        )
     return data

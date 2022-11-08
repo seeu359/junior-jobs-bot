@@ -27,6 +27,7 @@ class Statistics(Base):
     site_id = Column(Integer, ForeignKey('Sites.id'), default=1)
     vacancies = Column(Integer)
     date = Column(Date)
+    no_experience = Column(Integer, default=0)
 
 
 class Regions(Base):
@@ -43,3 +44,18 @@ class Sites(Base):
     id = Column(Integer, primary_key=True)
     site = Column(String(255))
     r = relationship('Statistics')
+
+
+class Users(Base):
+    __tablename__ = 'Users'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    telegram_id = Column(Integer, nullable=False, unique=True)
+
+
+class UsersInfo(Base):
+    __tablename__ = 'UserInfo'
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey(Users.id))
+    created_at = Date()

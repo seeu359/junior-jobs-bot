@@ -1,3 +1,5 @@
+"""Entry point"""
+
 from aiogram import executor
 from jun_jobs_bot.bot import dp
 from jun_jobs_bot import models
@@ -5,7 +7,6 @@ from jun_jobs_bot.handlers.info_handler import register_info_handlers
 from jun_jobs_bot.handlers.primary_handler import register_primary_handlers
 from jun_jobs_bot.handlers.admin_handler import register_admin_handlers
 from loguru import logger
-"""Entry point"""
 
 
 def main():

@@ -4,6 +4,11 @@ on:
   - push
   - pull_request
 
+env:
+    DB_CONNECT: DB_CONNECT
+    TG_TOKEN: TG_TOKEN
+    ADMIN_ID: ADMIN_ID
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +29,7 @@ jobs:
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.7.4
         env:
+
           CC_TEST_REPORTER_ID: ${{ secrets.TEST_COV_SECRET }}
         with:
           coverageCommand: make test-coverage

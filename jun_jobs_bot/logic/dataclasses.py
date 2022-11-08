@@ -3,22 +3,44 @@ from typing import NamedTuple, TypedDict
 
 class LanguagesId(TypedDict):
     python: int
-    java: int
     php: int
     javascript: int
     ruby: int
+    java: int
 
 
-class RegionId(TypedDict):
-    Russia: int
+LANGUAGES_ID = LanguagesId(
+    python=1,
+    php=2,
+    javascript=3,
+    ruby=4,
+    java=5
+)
 
 
-class Languages(NamedTuple):
+class AvailableRegions(NamedTuple):
+    """Available regions for sampling jobs.
+    Structure:
+    Region = Region ID in hh api region-dictionary. The ID also matches the ID
+    in the database"""
+    Russia = 113
+
+
+class AvailableLanguages(NamedTuple):
     python: str
     php: str
     javascript: str
     ruby: str
     java: str
+
+
+AVAILABLE_LANGUAGES = AvailableLanguages(
+    python='python',
+    php='php',
+    javascript='javascript',
+    ruby='ruby',
+    java='java'
+)
 
 
 class CompareType(NamedTuple):
@@ -30,13 +52,30 @@ class CompareType(NamedTuple):
     per_year: str
 
 
-languages_id = LanguagesId(python=1, php=2, javascript=3, ruby=4, java=5)
+COMPARE_TYPE = CompareType(
+    right_now='rightnow',
+    per_week='perweek',
+    per_month='permonth',
+    per_3_month='per3month',
+    per_6_month='per6month',
+    per_year='peryear'
+)
 
-region_id = RegionId(Russia=113)
 
-languages = Languages(python='python', php='php', javascript='javascript',
-                      ruby='ruby', java='java')
+class Constants(TypedDict):
+    Coefficient: int
+    perweek: int
+    permonth: int
+    per3month: int
+    per6month: int
+    peryear: int
 
-compare_type = CompareType(right_now='rightnow', per_week='perweek',
-                           per_month='permonth', per_3_month='per3month',
-                           per_6_month='per6month', per_year='peryear')
+
+CONSTANTS = Constants(
+    Coefficient=100,
+    perweek=7,
+    permonth=30,
+    per3month=90,
+    per6month=180,
+    peryear=365
+)

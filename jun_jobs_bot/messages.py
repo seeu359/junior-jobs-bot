@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from string import Template
 
 
 @dataclass
@@ -19,3 +20,21 @@ class MessageReply:
     HAVE_NO_DATE = 'Today\'s data has not yet been uploaded'
     DATA_DOWNLOADED_SUCCESS = 'The data was successfully uploaded to the ' \
                               'database'
+
+
+TODAY_STAT = Template(
+    '$language vacancies are currently: $all_vacancies.\n'
+    'Of these jobs, there are no experience requirements: $no_exp_vacancies'
+)
+
+VACS_NO_CHANGE = 'The number of vacancies has not changed'
+
+VACS_DECREASED = Template('The number of $language jobs decreased by $result%')
+
+VACS_INCREASED = Template(
+    'The number of $language vacancies has increased by $result%'
+)
+
+NOT_CORRECT_LANG = 'I can\'t process this kind of language'
+
+NOT_CORRECT_COMPARE_TYPE = 'I can\'t compare it to this type of'

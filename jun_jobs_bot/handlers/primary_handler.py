@@ -30,7 +30,7 @@ async def get_result(message: types.Message, state: FSMContext):
     data = await state.get_data()
     try:
         statistics.validate_data(data)
-    except exceptions.NotCorrectMessage as e:
+    except exceptions.NotCorrectData as e:
         await message.answer(str(e), reply_markup=ReplyKeyboardRemove())
         await state.finish()
     else:

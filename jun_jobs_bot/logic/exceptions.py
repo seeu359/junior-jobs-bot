@@ -1,4 +1,4 @@
-class NotCorrectMessage(Exception):
+class NotCorrectData(Exception):
     pass
 
 
