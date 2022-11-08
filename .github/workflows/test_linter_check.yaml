@@ -3,7 +3,9 @@ name: code-check
 on:
   - push
   - pull_request
-
+  -
+env:
+  DB_CONNECT: ${{ secrets.DB_CONNECT }}
 
 jobs:
   build:
