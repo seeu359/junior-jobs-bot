@@ -4,6 +4,9 @@ on:
   - push
   - pull_request
 
+env:
+    TG_TOKEN: TG_TOKEN
+    ADMIN_ID: ADMIN_ID
 
 jobs:
   build:
@@ -19,6 +22,9 @@ jobs:
           pip install poetry
           make install
       - name: Run tests and lint
+        env:
+
+          DB_CONNECT: DB_CONNECT
         run: |
             make pytest
             make lint
