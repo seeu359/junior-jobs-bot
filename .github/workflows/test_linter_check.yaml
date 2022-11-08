@@ -4,10 +4,6 @@ on:
   - push
   - pull_request
 
-env:
-    DB_CONNECT: ${{ env.DB_CONNECT }}
-    TG_TOKEN: ${{ env.TG_TOKEN }}
-    ADMIN_ID: ${{ env.ADMIN_ID }}
 
 jobs:
   build:
@@ -25,7 +21,9 @@ jobs:
       - name: Run tests and lint
         env:
 
-          DB_CONNECT: DB_CONNECT
+          DB_CONNECT: ${{ env.DB_CONNECT }}
+          TG_TOKEN: ${{ env.TG_TOKEN }}
+          ADMIN_ID: ${{ env.ADMIN_ID }}
         run: |
             make pytest
             make lint
