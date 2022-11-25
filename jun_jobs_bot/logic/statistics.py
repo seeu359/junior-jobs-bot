@@ -1,5 +1,5 @@
 from jun_jobs_bot.logic.exceptions import NotCorrectData
-from jun_jobs_bot.logic.dataclasses import COMPARE_TYPE, LANGUAGES_ID, \
+from jun_jobs_bot.dataclasses import COMPARE_TYPE, LANGUAGES_ID, \
     AVAILABLE_LANGUAGES, CONSTANTS
 from jun_jobs_bot import messages as msg
 from jun_jobs_bot.models import Statistics
@@ -7,16 +7,21 @@ from loguru import logger
 from jun_jobs_bot.logic.db_work import DatabaseWorker
 
 
-def process_request(data: dict[str, str]) -> str:
-    _language, _compare_type = data['language'], data['compare_type']
-    ct_handling = _compare_type.lower().replace(' ', '')
-    language_id = LANGUAGES_ID[_language.lower()]
-    stat = _Statistics(_language, language_id)
-    if ct_handling == COMPARE_TYPE.right_now:
-        data = stat.get_today_stat()
-    else:
-        data = stat.get_stats_by_comparison_type(ct_handling)
-    return data
+def process_request_data(data: dict[str, str]) -> tuple[str, str]:
+    language, compare_type = data['language'], data['compare_type']
+    processed_compare_type = compare_type.lower().replace(' ', '')
+    return language, processed_compare_type
+
+
+def get_statistics(language: str, compare_type: str) -> str:
+    language_id = LANGUAGES_ID[language.lower()]
+    stat = Statistics(language, language_id)
+    if compare_type == COMPARE_TYPE.right_now:
+        today_data = stat.get_today_stat()
+        return stat.return_today_stats(today_data)
+    now, past_time = stat.get_stats_by_comparison_type(compare_type)
+    compute_state = stat.compute_stats(now, past_time)
+    return stat.return_stat_by_comp_type(compute_state)
 
 
 class _Statistics:
@@ -27,38 +32,47 @@ class _Statistics:
         self.language = language
         self.language_id = language_id
 
-    def get_today_stat(self) -> str:
+    def get_today_stat(self) -> str | Statistics:
         vacancies = self.db_worker.get_today_stat(self.language_id)
 
-        if vacancies is None:
-            return msg.MessageReply.HAVE_NO_DATE
         logger.info(f'Data: {self.language}, {vacancies.vacancies}, '
                     f'{vacancies.date}')
 
+        if vacancies is None:
+            return msg.MessageReply.HAVE_NO_DATE
+        return vacancies
+
+    def get_stats_by_comparison_type(
+            self, _compare_type: str) -> tuple[Statistics, Statistics]:
+        now = self.db_worker.get_today_stat(self.language_id)
+        past_time = self.db_worker.get_data_by_comparison_type(
+            _compare_type, self.language_id)
+        return now, past_time
+
+    @staticmethod
+    def compute_stats(now: Statistics, past_time: Statistics) -> int:
+        return round(now.vacancies / past_time.vacancies *
+                     CONSTANTS['Coefficient'] - CONSTANTS['Coefficient'])
+
+    def return_today_stats(self, vacancies: str | Statistics) -> str:
+        if isinstance(vacancies, str):
+            return vacancies
         return msg.TODAY_STAT.substitute(
             language=self.language,
             all_vacancies=vacancies.vacancies,
             no_exp_vacancies=vacancies.no_experience
         )
 
-    def get_stats_by_comparison_type(self, _compare_type: str) -> str:
-        past_time, now = self.db_worker.get_data_by_comparison_type(
-            _compare_type, self.language_id)
-        result = self.compute_stats(past_time, now)
-        return result
-
-    def compute_stats(self, past_time: Statistics, now: Statistics) -> str:
-        result = round(now.vacancies / past_time.vacancies *
-                       CONSTANTS['Coefficient'] - CONSTANTS['Coefficient'])
-        if result < 0:
+    def return_stat_by_comp_type(self, vacancies: int) -> str:
+        if vacancies < 0:
             return msg.VACS_DECREASED.substitute(
                 language=self.language,
-                result=result,
+                result=vacancies,
             )
-        elif result > 0:
+        elif vacancies > 0:
             return msg.VACS_INCREASED.substitute(
                 language=self.language,
-                result=result,
+                result=vacancies,
             )
         else:
             return msg.VACS_NO_CHANGE

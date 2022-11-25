@@ -1,7 +1,9 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Enum
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
+from . import dataclasses
 from jun_jobs_bot.settings import DB_CONNECT
+
 
 engine = create_engine(DB_CONNECT)
 
@@ -49,13 +51,9 @@ class Sites(Base):
 class Users(Base):
     __tablename__ = 'Users'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    telegram_id = Column(Integer, nullable=False, unique=True)
-
-
-class UsersInfo(Base):
-    __tablename__ = 'UserInfo'
-
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey(Users.id))
-    created_at = Date()
+    name = Column(String(250), nullable=False, default='')
+    experience = Column(Enum(dataclasses.ExperienceType))
+    employed = Column(Enum(dataclasses.Employed))
+    telegram_id = Column(Integer, nullable=False, unique=True)
+    description = Column(String, default='', unique=False)

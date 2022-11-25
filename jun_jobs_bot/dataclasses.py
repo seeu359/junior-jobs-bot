@@ -1,4 +1,13 @@
 from typing import NamedTuple, TypedDict
+from enum import Enum
+
+
+class ExperienceType(Enum):
+    pass
+
+
+class Employed(Enum):
+    pass
 
 
 class LanguagesId(TypedDict):
@@ -18,12 +27,17 @@ LANGUAGES_ID = LanguagesId(
 )
 
 
-class AvailableRegions(NamedTuple):
+class AvailableRegions(TypedDict):
     """Available regions for sampling jobs.
     Structure:
     Region = Region ID in hh api region-dictionary. The ID also matches the ID
     in the database"""
-    Russia = 113
+    Russia: int
+
+
+AVAILABLE_REGIONS = AvailableRegions(
+    Russia=113,
+)
 
 
 class AvailableLanguages(NamedTuple):

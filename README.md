@@ -1,0 +1,1 @@
+[![code-check](https://github.com/seeu359/junior-jobs-bot/actions/workflows/test_linter_check.yaml/badge.svg)](https://github.com/seeu359/junior-jobs-bot/actions/workflows/test_linter_check.yaml)

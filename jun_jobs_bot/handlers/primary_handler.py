@@ -34,7 +34,12 @@ async def get_result(message: types.Message, state: FSMContext):
         await message.answer(str(e), reply_markup=ReplyKeyboardRemove())
         await state.finish()
     else:
-        answer = statistics.process_request(data)
+        language, processed_compare_type = \
+            statistics.process_request_data(data)
+        answer = statistics.get_statistics(
+            language,
+            processed_compare_type,
+        )
         await message.answer(answer, reply_markup=ReplyKeyboardRemove())
         await state.finish()
 
