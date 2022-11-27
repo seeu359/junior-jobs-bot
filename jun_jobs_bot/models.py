@@ -1,4 +1,3 @@
-import loguru
 from sqlalchemy import create_engine, Enum
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
