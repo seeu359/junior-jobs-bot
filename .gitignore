@@ -4,6 +4,9 @@
 __pycache__
 *.sqlite
 .pytest_cache
-/alembic
 *.ini
 *.txt
+.mypy_cache
+*.xml
+.coverage
+test-coverage-tool

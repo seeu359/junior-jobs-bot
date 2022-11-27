@@ -27,7 +27,7 @@ jobs:
           TG_TOKEN: ${{ env.TG_TOKEN }}
           ADMIN_ID: ${{ env.ADMIN_ID }}
         run: |
-            make pytest
+            make test
             make lint
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.7.4

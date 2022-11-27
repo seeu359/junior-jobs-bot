@@ -12,7 +12,7 @@ class Request(StatesGroup):
     all = State()
 
 
-async def choose_lang(message: types.Message):
+async def select_lang(message: types.Message):
     if str(message.from_user.id) == ADMIN_ID:
         kb_client = get_admin_buttons()
         await message.answer(MessageReply.ADMIN_START, reply_markup=kb_client)
@@ -38,5 +38,5 @@ async def get_result(message: types.Message, state: FSMContext):
 
 
 def register_admin_handlers(dp: Dispatcher):
-    dp.register_message_handler(choose_lang, commands=['admin'], state=None)
+    dp.register_message_handler(select_lang, commands=['admin'], state=None)
     dp.register_message_handler(get_result, state=Request.all)

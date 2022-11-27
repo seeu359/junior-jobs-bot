@@ -1,13 +1,15 @@
+import loguru
 from sqlalchemy import create_engine, Enum
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
-from . import dataclasses
-from jun_jobs_bot.settings import DB_CONNECT
+from jun_jobs_bot import dataclasses
+from jun_jobs_bot.settings import SQLITE_CONNECT
 
 
-engine = create_engine(DB_CONNECT)
+engine = create_engine(SQLITE_CONNECT)
 
 session = sessionmaker(engine)
+
 
 Base = declarative_base(engine)
 

@@ -15,16 +15,16 @@ def process_request_data(data: dict[str, str]) -> tuple[str, str]:
 
 def get_statistics(language: str, compare_type: str) -> str:
     language_id = LANGUAGES_ID[language.lower()]
-    stat = Statistics(language, language_id)
+    stat = Stats(language, language_id)
     if compare_type == COMPARE_TYPE.right_now:
         today_data = stat.get_today_stat()
         return stat.return_today_stats(today_data)
     now, past_time = stat.get_stats_by_comparison_type(compare_type)
-    compute_state = stat.compute_stats(now, past_time)
+    compute_state = stat.compute_stats(now.vacancies, past_time.vacancies)
     return stat.return_stat_by_comp_type(compute_state)
 
 
-class _Statistics:
+class Stats:
 
     db_worker = DatabaseWorker()
 
@@ -32,7 +32,7 @@ class _Statistics:
         self.language = language
         self.language_id = language_id
 
-    def get_today_stat(self) -> str | Statistics:
+    def get_today_stat(self) -> str | tuple[int, int]:
         vacancies = self.db_worker.get_today_stat(self.language_id)
 
         logger.info(f'Data: {self.language}, {vacancies.vacancies}, '
@@ -40,7 +40,7 @@ class _Statistics:
 
         if vacancies is None:
             return msg.MessageReply.HAVE_NO_DATE
-        return vacancies
+        return vacancies.vacancies, vacancies.no_experience
 
     def get_stats_by_comparison_type(
             self, _compare_type: str) -> tuple[Statistics, Statistics]:
@@ -50,20 +50,22 @@ class _Statistics:
         return now, past_time
 
     @staticmethod
-    def compute_stats(now: Statistics, past_time: Statistics) -> int:
-        return round(now.vacancies / past_time.vacancies *
+    def compute_stats(now: int, past_time: int) -> int:
+        return round(now / past_time *
                      CONSTANTS['Coefficient'] - CONSTANTS['Coefficient'])
 
-    def return_today_stats(self, vacancies: str | Statistics) -> str:
+    def return_today_stats(self, vacancies: tuple[int, int]) -> str:
+        """Returns the final line with today's statistics"""
         if isinstance(vacancies, str):
             return vacancies
         return msg.TODAY_STAT.substitute(
             language=self.language,
-            all_vacancies=vacancies.vacancies,
-            no_exp_vacancies=vacancies.no_experience
+            all_vacancies=vacancies[0],
+            no_exp_vacancies=vacancies[1],
         )
 
     def return_stat_by_comp_type(self, vacancies: int) -> str:
+        """Returns the final line with statistics """
         if vacancies < 0:
             return msg.VACS_DECREASED.substitute(
                 language=self.language,
@@ -79,11 +81,11 @@ class _Statistics:
 
 
 def validate_data(data: dict[str, str]) -> None:
-    _language, _compare_type = data['language'], data['compare_type']
-    if _language.lower() not in AVAILABLE_LANGUAGES:
-        logger.error(f'Not correct data. Language: {_language.lower()}')
+    language, compare_type = data['language'], data['compare_type']
+    if language.lower() not in AVAILABLE_LANGUAGES:
+        logger.error(f'Not correct data. Language: {language.lower()}')
         raise NotCorrectData(msg.NOT_CORRECT_LANG)
-    if _compare_type.lower().replace(' ', '') not in COMPARE_TYPE:
+    if compare_type.lower().replace(' ', '') not in COMPARE_TYPE:
         logger.error(f'Not correct data. Compare type: '
-                     f'{_compare_type.lower()}')
+                     f'{compare_type.lower()}')
         raise NotCorrectData(msg.NOT_CORRECT_COMPARE_TYPE)
