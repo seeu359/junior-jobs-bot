@@ -9,3 +9,7 @@ test-coverage:
 
 run:
 	poetry run jun_jubs_bot
+
+install:
+	poetry install
+	poetry build
