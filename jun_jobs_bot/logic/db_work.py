@@ -1,25 +1,13 @@
+import asyncio
+import aiohttp
+from aiohttp import ClientSession
+from loguru import logger
 from datetime import date, timedelta
+from jun_jobs_bot.logic.exceptions import URLUnavailableError
+from jun_jobs_bot import models
+from jun_jobs_bot import text
 from jun_jobs_bot.dataclasses import LANGUAGES_ID, AVAILABLE_REGIONS, \
     AVAILABLE_LANGUAGES, CONSTANTS
-from requests.exceptions import RequestException, HTTPError, URLRequired, \
-    TooManyRedirects, Timeout
-from jun_jobs_bot.logic.exceptions import DataDownloadError
-from jun_jobs_bot import models
-from loguru import logger
-from string import Template
-import requests
-
-
-ALL_VACANCIES_URL_TEMPLATE = Template(
-        'https://api.hh.ru/vacancies?'
-        'text=$language+junior&per_page=100&area=$area_id'
-)
-
-NO_EXPERIENCE_URL_TEMPLATE = Template(
-        'https://api.hh.ru/vacancies?'
-        'text=$language+junior&per_page=100&'
-        'area=$area_id&experience=noExperience'
-)
 
 
 class DatabaseWorker:
@@ -34,18 +22,19 @@ class DatabaseWorker:
                    (self.model.language_id == language_id)).first()
 
     def get_data_by_comparison_type(
-            self, compare_type: str, language_id: int) -> models.Statistics:
-
-        days_diff = date.today() - timedelta(days=CONSTANTS['perweek'])
+            self, compare_type: str, language_id: int
+            ) -> models.Statistics:
+        
+        if compare_type not in ('perweek', 'permonth', 'rightnow'):
+            compare_type = 'permonth'
+        days_diff = date.today() - timedelta(days=CONSTANTS[compare_type])
         with models.session() as s:
-
             past_time = s.query(self.model).filter(
                 (self.model.date == days_diff) &
                 (self.model.language_id == language_id)).first()
-            logger.info(f'Past time: '
-                        f'Lang id: {past_time.language_id}, '
+            logger.info(f'Past time: ' f'Lang id: {past_time.language_id}, '
                         f'Vacancies: {past_time.vacancies}')
-        return past_time
+            return past_time
 
     def check_db_record(self) -> bool:
         with models.session() as s:
@@ -55,9 +44,8 @@ class DatabaseWorker:
                 return True
             return False
 
-    def upload_to_db(self) -> None:
+    def upload_to_db(self, data) -> None:
         with models.session() as s:
-            data = _get_data()
             for key, value in data.items():
                 record = self.model(
                     language_id=LANGUAGES_ID[key],
@@ -67,42 +55,75 @@ class DatabaseWorker:
                     no_experience=value[1]
                     )
 
-                logger.debug('Record has been added in db!')
                 s.add(record)
             s.commit()
 
 
-def _get_data() -> dict[str, tuple[int, int]]:
-    data = dict()
+async def get_data() -> dict[str, list]:
+    async with aiohttp.ClientSession() as session:
 
+        requests_all_vacancies = [
+            _get_vacancies(session, url, lang) for lang, url
+            in list(_get_url_template().items())
+        ]
+
+        requests_no_exp_vacancies = [
+            _get_vacancies(session, url, lang) for lang, url in
+            list(_get_url_template(text.NO_EXP_TEMPLATE).items())
+        ]
+        all_vacs = await asyncio.gather(*requests_all_vacancies)
+        no_exp = await asyncio.gather(*requests_no_exp_vacancies)
+
+        return _get_merge_data([*all_vacs, *no_exp])
+
+
+async def _get_vacancies(session: ClientSession, url: str, language):
+    async with session.get(url) as result:
+        if result.status != 200:
+            logger.error(
+                text.ExceptionMessage.CONNECTION_ERROR.substitute(
+                    url=url,
+                    status=result.status,
+                )
+            )
+            raise URLUnavailableError(
+                text.ExceptionMessage.CONNECTION_ERROR.substitute(
+                    url=url,
+                    status=result.status,
+                )
+            )
+        response = await result.json()
+        return {language: response['found']}
+
+
+def _get_url_template(template=text.ALL_VACS_TEMPLATE):
+    urls = dict()
     for language in AVAILABLE_LANGUAGES:
-        all_vacancies_url, no_experience_url = _get_url_template(language)
+        url = template.substitute(
+           language=language,
+           area_id=AVAILABLE_REGIONS['Russia'],
+        )
+        urls[language] = url
+    return urls
 
+
+def _get_merge_data(data: list[dict]) -> dict[str, list]:
+    merge_data = dict()
+    for record in data:
+        for k, v in record.items():
+            if k in merge_data:
+                merge_data[k].append(v)
+            else:
+                merge_data[k] = [v]
+
+    return merge_data
+
+
+async def func():
+    async with aiohttp.ClientSession() as s:
         try:
-            all_vacancies_query = requests.get(all_vacancies_url).json()
-            logger.info('All - running')
-            no_experience_query = requests.get(no_experience_url).json()
-            logger.info('noexp - running')
+            a = await _get_vacancies(s, 'https://site.com/404', 'some')
+        except URLUnavailableError:
+            print('Ошибка')
 
-        except (ConnectionError, RequestException, HTTPError,
-                URLRequired, TooManyRedirects, Timeout) as e:
-            logger.error(f'Request error: {e}')
-            raise DataDownloadError(str(e))
-
-        data[language]: tuple[int, int] = \
-            all_vacancies_query['found'], no_experience_query['found']
-    return data
-
-
-def _get_url_template(language: str) -> tuple[str, str]:
-
-    all_vacancies_url = ALL_VACANCIES_URL_TEMPLATE.substitute(
-       language=language,
-       area_id=AVAILABLE_REGIONS['Russia'],
-    )
-
-    no_experience_url = NO_EXPERIENCE_URL_TEMPLATE.substitute(
-        language=language,
-        area_id=AVAILABLE_REGIONS['Russia'],
-    )
-    return all_vacancies_url, no_experience_url
+print(asyncio.run(func()))

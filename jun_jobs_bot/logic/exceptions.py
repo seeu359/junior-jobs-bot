@@ -2,5 +2,5 @@ class NotCorrectData(Exception):
     pass
 
 
-class DataDownloadError(Exception):
+class URLUnavailableError(Exception):
     pass

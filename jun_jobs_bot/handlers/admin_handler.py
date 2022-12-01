@@ -1,10 +1,11 @@
 from aiogram import Dispatcher, types
+from jun_jobs_bot.logic.exceptions import URLUnavailableError
+from jun_jobs_bot.logic.db_work import DatabaseWorker, get_data
 from jun_jobs_bot.settings import ADMIN_ID
-from aiogram.dispatcher.filters.state import State, StatesGroup
-from jun_jobs_bot.messages import MessageReply
+from jun_jobs_bot.text import MessageReply
 from jun_jobs_bot.handlers.buttons import get_admin_buttons
 from aiogram.dispatcher import FSMContext
-from jun_jobs_bot.logic.db_work import DatabaseWorker
+from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove
 
 
@@ -31,7 +32,14 @@ async def get_result(message: types.Message, state: FSMContext):
                                  reply_markup=ReplyKeyboardRemove())
             await state.finish()
         else:
-            db_worker.upload_to_db()
+            try:
+                data = await get_data()
+                db_worker.upload_to_db(data)
+            except URLUnavailableError as e:
+                await message.answer(
+                    str(e), reply_markup=ReplyKeyboardRemove()
+                )
+                await state.finish()
             await message.answer(MessageReply.DATA_DOWNLOADED_SUCCESS,
                                  reply_markup=ReplyKeyboardRemove())
             await state.finish()
