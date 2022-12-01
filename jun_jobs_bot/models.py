@@ -9,11 +9,10 @@ engine = create_engine(SQLITE_CONNECT)
 
 session = sessionmaker(engine)
 
+constructor = declarative_base(engine)
 
-Base = declarative_base(engine)
 
-
-class Language(Base):
+class Language(constructor):
     __tablename__ = 'Languages'
 
     id = Column(Integer, primary_key=True)
@@ -21,7 +20,7 @@ class Language(Base):
     r = relationship('Statistics')
 
 
-class Statistics(Base):
+class Statistics(constructor):
     __tablename__ = 'Statistics'
 
     id = Column(Integer, primary_key=True)
@@ -33,7 +32,7 @@ class Statistics(Base):
     no_experience = Column(Integer, default=0)
 
 
-class Regions(Base):
+class Regions(constructor):
     __tablename__ = 'Regions'
 
     id = Column(Integer, primary_key=True)
@@ -41,7 +40,7 @@ class Regions(Base):
     r = relationship('Statistics')
 
 
-class Sites(Base):
+class Sites(constructor):
     __tablename__ = 'Sites'
 
     id = Column(Integer, primary_key=True)
@@ -49,7 +48,7 @@ class Sites(Base):
     r = relationship('Statistics')
 
 
-class Users(Base):
+class Users(constructor):
     __tablename__ = 'Users'
 
     id = Column(Integer, primary_key=True)

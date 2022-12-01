@@ -1,8 +1,8 @@
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
-from jun_jobs_bot.messages import MessageReply
+from jun_jobs_bot.text import MessageReply
 from jun_jobs_bot.handlers import buttons
-from jun_jobs_bot.logic import statistics, exceptions
+from jun_jobs_bot.logic import services, exceptions
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
@@ -29,14 +29,14 @@ async def get_result(message: types.Message, state: FSMContext):
     await state.update_data(compare_type=message.text)
     data = await state.get_data()
     try:
-        statistics.validate_data(data)
+        services.validate_data(data)
     except exceptions.NotCorrectData as e:
         await message.answer(str(e), reply_markup=ReplyKeyboardRemove())
         await state.finish()
     else:
         language, processed_compare_type = \
-            statistics.process_request_data(data)
-        answer = statistics.get_statistics(
+            services.process_request_data(data)
+        answer = services.get_statistics(
             language,
             processed_compare_type,
         )

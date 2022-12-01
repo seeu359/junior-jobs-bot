@@ -24,7 +24,6 @@ class DatabaseWorker:
     def get_data_by_comparison_type(
             self, compare_type: str, language_id: int
             ) -> models.Statistics:
-        
         if compare_type not in ('perweek', 'permonth', 'rightnow'):
             compare_type = 'permonth'
         days_diff = date.today() - timedelta(days=CONSTANTS[compare_type])
@@ -117,13 +116,3 @@ def _get_merge_data(data: list[dict]) -> dict[str, list]:
                 merge_data[k] = [v]
 
     return merge_data
-
-
-async def func():
-    async with aiohttp.ClientSession() as s:
-        try:
-            a = await _get_vacancies(s, 'https://site.com/404', 'some')
-        except URLUnavailableError:
-            print('Ошибка')
-
-print(asyncio.run(func()))
