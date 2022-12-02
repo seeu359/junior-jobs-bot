@@ -1,5 +1,5 @@
-from typing import NamedTuple, TypedDict
 from enum import Enum
+from typing import NamedTuple, TypedDict
 
 
 class ExperienceType(Enum):

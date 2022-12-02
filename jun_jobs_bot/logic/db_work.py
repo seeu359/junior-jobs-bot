@@ -6,7 +6,7 @@ from datetime import date, timedelta
 from jun_jobs_bot.logic.exceptions import URLUnavailableError
 from jun_jobs_bot import models
 from jun_jobs_bot import text
-from jun_jobs_bot.dataclasses import LANGUAGES_ID, AVAILABLE_REGIONS, \
+from jun_jobs_bot import LANGUAGES_ID, AVAILABLE_REGIONS, \
     AVAILABLE_LANGUAGES, CONSTANTS
 
 

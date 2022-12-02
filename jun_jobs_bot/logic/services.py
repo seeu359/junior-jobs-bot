@@ -1,8 +1,8 @@
 from loguru import logger
-from .statistics import Stats
-from .exceptions import NotCorrectData
-from .. import text
-from ..dataclasses import LANGUAGES_ID, COMPARE_TYPE, AVAILABLE_LANGUAGES
+from jun_jobs_bot import text
+from jun_jobs_bot import LANGUAGES_ID, COMPARE_TYPE, AVAILABLE_LANGUAGES
+from jun_jobs_bot.logic.statistics import Stats
+from jun_jobs_bot.logic.exceptions import NotCorrectData
 
 
 def process_request_data(data: dict[str, str]) -> tuple[str, str]:

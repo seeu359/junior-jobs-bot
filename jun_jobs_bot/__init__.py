@@ -1,0 +1,10 @@
+from jun_jobs_bot.dataclasses import LANGUAGES_ID, AVAILABLE_REGIONS,\
+    AVAILABLE_LANGUAGES, CONSTANTS, COMPARE_TYPE
+
+__all__ = [
+    'LANGUAGES_ID',
+    'AVAILABLE_LANGUAGES',
+    'AVAILABLE_REGIONS',
+    'CONSTANTS',
+    'COMPARE_TYPE',
+]

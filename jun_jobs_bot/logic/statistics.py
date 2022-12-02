@@ -1,5 +1,5 @@
 from loguru import logger
-from jun_jobs_bot.dataclasses import CONSTANTS
+from jun_jobs_bot import CONSTANTS
 from jun_jobs_bot.models import Statistics
 from jun_jobs_bot.text import MessageReply
 from jun_jobs_bot.logic.db_work import DatabaseWorker

@@ -10,6 +10,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 ADMIN_ID = os.getenv('ADMIN_ID')
 
-SQLITE_CONNECT = 'sqlite:///' + str(BASE_DIR) + '/db.sqlite'
+SQLITE = 'sqlite:///' + str(BASE_DIR) + '/db.sqlite'
 
-PG_CONNECT = os.getenv('DB_CONNECT')
+POSTGRES = os.getenv('PG_CONNECT')
+
+DATABASE = POSTGRES if POSTGRES else SQLITE

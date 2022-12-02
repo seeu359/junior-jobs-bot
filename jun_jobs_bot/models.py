@@ -2,10 +2,10 @@ from sqlalchemy import create_engine, Enum
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from jun_jobs_bot import dataclasses
-from jun_jobs_bot.settings import SQLITE_CONNECT
+from jun_jobs_bot.settings import DATABASE
 
 
-engine = create_engine(SQLITE_CONNECT)
+engine = create_engine(DATABASE)
 
 session = sessionmaker(engine)
 
