@@ -19,7 +19,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install poetry
-          make install
+          make p_install
       - name: Run tests and lint
         env:
 
