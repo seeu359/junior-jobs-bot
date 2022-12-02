@@ -10,6 +10,9 @@ test-coverage:
 run:
 	poetry run jun_jubs_bot
 
-install:
+p_install:
 	poetry install
 	poetry build
+
+install:
+	pip install -r requirements.txt
