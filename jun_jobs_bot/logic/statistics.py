@@ -1,4 +1,5 @@
 import requests
+from typing import Dict
 from furl import furl
 from dataclasses import dataclass
 from jun_jobs_bot.logic.classes import RequestParams
