@@ -1,39 +1,80 @@
-from loguru import logger
+from pydantic import ValidationError
+from jun_jobs_bot.logic import statistics as st
+from jun_jobs_bot.logic.classes import RequestParams, RequestData
 from jun_jobs_bot import text
-from jun_jobs_bot import LANGUAGES_ID, COMPARE_TYPE, AVAILABLE_LANGUAGES
-from jun_jobs_bot.logic.statistics import Stats
-from jun_jobs_bot.logic.exceptions import NotCorrectData
 
 
-def process_request_data(data: dict[str, str]) -> tuple[str, str]:
-    language, compare_type = data['language'], data['compare_type']
-    processed_compare_type = compare_type.lower().replace(' ', '')
-    return language, processed_compare_type
+def get_language(data: dict[str, str]) -> str | None:
+    return data.get('language', None)
 
 
-def get_statistics(language: str, compare_type: str) -> str:
-    language_id = LANGUAGES_ID[language.lower()]
-    stat = Stats(language, language_id)
-
-    if compare_type == COMPARE_TYPE.right_now:
-        today_data = stat.get_today_stat()
-        return stat.return_today_stats(today_data)
-
-    now, past_time = stat.get_stats_by_comparison_type(compare_type)
-    compute_state = stat.compute_stats(now.vacancies, past_time.vacancies)
-    return stat.return_stat_by_comp_type(compute_state)
+def get_compare_type(data: dict[str, str]) -> str | None:
+    return data.get('compare_type', None)
 
 
-def validate_data(data: dict[str, str]) -> None:
-    language, compare_type = data['language'], data['compare_type']
+def get_request_params(request_data: RequestData) -> RequestParams:
+    mapper = {
+        'rightnow': 'today',
+        'perweek': 'week',
+        'permonth': 'month',
+    }
+    language = request_data.language
+    compare_type = request_data.compare_type
+    return RequestParams(
+        language=language,
+        compare_type=mapper[compare_type]
+    )
 
-    if language.lower() not in AVAILABLE_LANGUAGES:
-        logger.error(f'Not correct data. Language: {language.lower()}')
-        raise NotCorrectData(text.MessageReply.NOT_CORRECT_LANG)
 
-    if compare_type.lower().replace(' ', '') not in COMPARE_TYPE:
+def make_error_response(error: ValidationError) -> str:
+    invalid_value = list()
+    for error in error.errors():
+        invalid_value.append(error['ctx']['given'])
+    return f'Can\'t process this data: {", ".join(invalid_value)}'
 
-        logger.error(f'Not correct data. Compare type: '
-                     f'{compare_type.lower()}')
 
-        raise NotCorrectData(text.MessageReply.NOT_CORRECT_COMPARE_TYPE)
+def make_params_from_request(data: dict[str, str]) -> str | RequestData:
+    language = get_language(data)
+    compare_type = get_compare_type(data)
+    request_data = RequestData(
+            language=_handle_params(language),
+            compare_type=_handle_params(compare_type),
+        )
+    return request_data
+
+
+def get_statistics(request_data: RequestData) -> str:
+    request_params = get_request_params(request_data)
+    _statistics = st.Statistics(request_params).stat
+    response = _hande_statistics(request_params, _statistics)
+    return response
+
+
+def _handle_params(param: str):
+    return param.replace(' ', '').lower()
+
+
+def _hande_statistics(params: RequestParams, stat) -> str:
+    language = stat['language'].capitalize()
+    if params.compare_type == 'today':
+        all_vacs = stat['vacancies']
+        no_exp_vac = stat['no_experience']
+        return text.MessageReply.TODAY_STAT.substitute(
+            language=language,
+            all_vacancies=all_vacs,
+            no_exp_vacancies=no_exp_vac,
+        )
+    else:
+        comparison = stat['comparison']['in_percent']
+        if comparison > 0:
+            return text.MessageReply.VACS_INCREASED.substitute(
+                language=language,
+                result=abs(comparison),
+            )
+        elif comparison < 0:
+            return text.MessageReply.VACS_DECREASED.substitute(
+                language=language,
+                result=abs(comparison),
+            )
+        else:
+            return text.MessageReply.VACS_NO_CHANGE

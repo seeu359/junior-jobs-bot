@@ -2,18 +2,6 @@ from dataclasses import dataclass
 from string import Template
 
 
-ALL_VACS_TEMPLATE = Template(
-        'https://api.hh.ru/vacancies?'
-        'text=$language+junior&per_page=100&area=$area_id'
-)
-
-NO_EXP_TEMPLATE = Template(
-        'https://api.hh.ru/vacancies?'
-        'text=$language+junior&per_page=100&'
-        'area=$area_id&experience=noExperience'
-)
-
-
 @dataclass
 class MessageReply:
     INFO = 'Hi. I can upload for you statistics on junior-level jobs in the ' \

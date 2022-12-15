@@ -2,9 +2,11 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from jun_jobs_bot.text import MessageReply
 from jun_jobs_bot.handlers import buttons
-from jun_jobs_bot.logic import services, exceptions
+from jun_jobs_bot.logic import services
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from pydantic import ValidationError
+from loguru import logger
 
 
 class Condition(StatesGroup):
@@ -29,18 +31,14 @@ async def get_result(message: types.Message, state: FSMContext):
     await state.update_data(compare_type=message.text)
     data = await state.get_data()
     try:
-        services.validate_data(data)
-    except exceptions.NotCorrectData as e:
-        await message.answer(str(e), reply_markup=ReplyKeyboardRemove())
+        request_data = services.make_params_from_request(data)
+        statistics = services.get_statistics(request_data)
+        await message.answer(statistics, reply_markup=ReplyKeyboardRemove())
         await state.finish()
-    else:
-        language, processed_compare_type = \
-            services.process_request_data(data)
-        answer = services.get_statistics(
-            language,
-            processed_compare_type,
-        )
-        await message.answer(answer, reply_markup=ReplyKeyboardRemove())
+    except ValidationError as e:
+        logger.info(e)
+        error = services.make_error_response(e)
+        await message.answer(error, reply_markup=ReplyKeyboardRemove())
         await state.finish()
 
 

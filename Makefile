@@ -8,7 +8,7 @@ test-coverage:
 	poetry run pytest --cov=jun_jobs_bot tests/ --cov-report xml
 
 run:
-	poetry run jun_jubs_bot
+	poetry run python bot
 
 p_install:
 	poetry install
