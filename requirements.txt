@@ -18,7 +18,7 @@ iniconfig==1.1.1
 loguru==0.6.0
 magic-filter==1.0.9
 Mako==1.2.4
-MarkupSafe==2.1.1
+MarkupS§afe==2.1.1
 mccabe==0.7.0
 multidict==6.0.3
 mypy==0.990
