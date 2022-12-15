@@ -1,6 +1,6 @@
-from dataclasses import dataclass
-from furl import furl
 import requests
+from furl import furl
+from dataclasses import dataclass
 from jun_jobs_bot.logic.classes import RequestParams
 
 
@@ -24,5 +24,5 @@ class Statistics:
             self.request_data.language / self.request_data.compare_type
         self.stat = self._get_stat()
 
-    def _get_stat(self) -> dict:
+    def _get_stat(self) -> Dict:
         return requests.get(self.url).json()

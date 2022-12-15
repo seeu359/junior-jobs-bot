@@ -1,15 +1,15 @@
 from pydantic import ValidationError
-from typing import Optional
+from typing import Optional, Dict
 from jun_jobs_bot.logic import statistics as st
 from jun_jobs_bot.logic.classes import RequestParams, RequestData
 from jun_jobs_bot import text
 
 
-def get_language(data: dict[str, str]) -> Optional[str, None]:
+def get_language(data: Dict[str, str]) -> Optional[str, None]:
     return data.get('language', None)
 
 
-def get_compare_type(data: dict[str, str]) -> Optional[str, None]:
+def get_compare_type(data: Dict[str, str]) -> Optional[str, None]:
     return data.get('compare_type', None)
 
 
@@ -34,7 +34,7 @@ def make_error_response(error: ValidationError) -> str:
     return f'Can\'t process this data: {", ".join(invalid_value)}'
 
 
-def make_params_from_request(data: dict[str, str]) \
+def make_params_from_request(data: Dict[str, str]) \
         -> Optional[str, RequestData]:
     language = get_language(data)
     compare_type = get_compare_type(data)
