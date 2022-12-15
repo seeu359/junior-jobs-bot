@@ -10,7 +10,7 @@ packages = [
 
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 aiogram = "^2.22.2"
 python-dotenv = "^0.21.0"
 pydantic = "^1.10.2"
