@@ -16,3 +16,8 @@ p_install:
 
 install:
 	pip install -r requirements.txt
+
+deploy:
+	pip install poetry
+	poetry install
+	poetry build
