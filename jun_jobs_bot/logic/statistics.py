@@ -2,7 +2,7 @@ import requests
 from typing import Dict
 from furl import furl
 from dataclasses import dataclass
-from jun_jobs_bot.logic.classes import RequestParams
+from jun_jobs_bot.logic.classes import RequestData
 
 
 @dataclass
@@ -17,7 +17,7 @@ class URLParts:
 
 class Statistics:
 
-    def __init__(self, request_data: RequestParams):
+    def __init__(self, request_data: RequestData):
 
         self.request_data = request_data
         self.url = \

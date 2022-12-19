@@ -1,37 +1,25 @@
 from pydantic import ValidationError
 from typing import Union, Dict
 from jun_jobs_bot.logic import statistics as st
-from jun_jobs_bot.logic.classes import RequestParams, RequestData
+from jun_jobs_bot.logic.classes import RequestData
 from jun_jobs_bot import text
 
 
 def get_language(data: Dict[str, str]) -> Union[str, None]:
+    """Abstraction for receive language from user input data"""
     return data.get('language', None)
 
 
 def get_compare_type(data: Dict[str, str]) -> Union[str, None]:
+    """Abstraction for receive compare type from user input data"""
     return data.get('compare_type', None)
-
-
-def get_request_params(request_data: RequestData) -> RequestParams:
-    mapper = {
-        'rightnow': 'today',
-        'perweek': 'week',
-        'permonth': 'month',
-    }
-    language = request_data.language
-    compare_type = request_data.compare_type
-    return RequestParams(
-        language=language,
-        compare_type=mapper[compare_type]
-    )
 
 
 def make_error_response(error: ValidationError) -> str:
     invalid_value = list()
     for error in error.errors():
         invalid_value.append(error['ctx']['given'])
-    return f'Can\'t process this data: {", ".join(invalid_value)}'
+    return f'Can\'t process this data: {", ".join(invalid_value)} :('
 
 
 def make_params_from_request(data: Dict[str, str]) \
@@ -46,17 +34,25 @@ def make_params_from_request(data: Dict[str, str]) \
 
 
 def get_statistics(request_data: RequestData) -> str:
-    request_params = get_request_params(request_data)
-    _statistics = st.Statistics(request_params).stat
-    response = _hande_statistics(request_params, _statistics)
+    _statistics = st.Statistics(request_data).stat
+    response = _hande_statistics(request_data, _statistics)
     return response
 
 
 def _handle_params(param: str) -> str:
-    return param.replace(' ', '').lower()
+    normalize_param = param.lower()
+    mapper = {
+        'right now': 'today',
+        'per week': 'week',
+        'per month': 'month',
+    }
+    compare_type = mapper.get(normalize_param)
+    if not compare_type:
+        return param.replace(' ', '')
+    return compare_type.replace(' ', '')
 
 
-def _hande_statistics(params: RequestParams, stat) -> str:
+def _hande_statistics(params: RequestData, stat) -> str:
     language = stat['language'].capitalize()
     if params.compare_type == 'today':
         all_vacs = stat['vacancies']

@@ -7,6 +7,11 @@
 
 >@JunJobsBot
 
+### API
+>https://jun-jobs-api.online/
+### API code
+> https://github.com/seeu359/junior-jobs-api
+
 ---
 ### Description
 The bot parses junior vacancies by the main programming languages, referring to the selected recruiting platform, and displays the statistics in a convenient form for the selected language. 
