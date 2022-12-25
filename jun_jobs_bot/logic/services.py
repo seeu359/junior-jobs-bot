@@ -49,7 +49,7 @@ def _handle_params(param: str) -> str:
     compare_type = mapper.get(normalize_param)
     if not compare_type:
         return normalize_param.replace(' ', '')
-    return normalize_param.replace(' ', '')
+    return compare_type.replace(' ', '')
 
 
 def _hande_statistics(params: RequestData, stat) -> str:
