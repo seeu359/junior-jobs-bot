@@ -1,11 +1,15 @@
 import unittest
-from jun_jobs_bot import text
 from aiogram_unittest import Requester
 from aiogram_unittest.handler import MessageHandler
 from aiogram_unittest.types.dataset import MESSAGE
+
+from jun_jobs_bot import text
 from jun_jobs_bot.handlers.info_handler import get_info, get_help
-from jun_jobs_bot.handlers.primary_handler import get_language, \
-    get_compare_type, Condition
+from jun_jobs_bot.handlers.primary_handler import (
+    get_language,
+    get_compare_type,
+    Condition,
+)
 
 
 class TestBot(unittest.IsolatedAsyncioTestCase):

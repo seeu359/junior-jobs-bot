@@ -5,7 +5,7 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from jun_jobs_bot.text import MessageReply
 from jun_jobs_bot.handlers import buttons
-from jun_jobs_bot.logic import services
+from jun_jobs_bot import services
 
 from loguru import logger
 from pydantic import ValidationError
