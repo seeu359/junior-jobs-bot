@@ -31,14 +31,11 @@ You can output the number of jobs right now, or choose the *type of comparison, 
 
 ### Dependencies
 
-| Library | Version | Description                                 |
-|---------|---------|---------------------------------------------|
-| python  | 3.10    |                                             |  
-| aiogram | 2.22.2    | Asynchronous framework for Telegram Bot API |
- | sqlalchemy | 1.4.42 | ORM for working with database |
- | psycopg2 | 2.9.5 | PostgreSQL database adapter |
- | aiohttp | 3.8.3 | Asynchronous HTTP requests to HH API |
- | alembic | 1.8.1 | Migration tools for SQLAlchemy ORM | 
+| Library | Version | Description                       |
+|---------|---------|-----------------------------------|
+| python  | 3.10    |                                   |
+ | request | 3.8.3 | HTTP request to Jun-jobs-api      |
+ | aiogram | 2.22.2| Main library for Telegram BOT API |
 
 ---
 

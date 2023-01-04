@@ -51,9 +51,11 @@ def make_params_from_request(data: Dict[str, str]) \
     return request_data
 
 
-def get_statistics(request_data: RequestData) -> str:
-    _statistics = _Statistics(request_data).stat
-    response = _hande_statistics(request_data, _statistics)
+def get_statistics(request_params: RequestData) -> str:
+
+    _statistics = _Statistics(request_params).stat
+    response = _hande_statistics(request_params, _statistics)
+
     return response
 
 
@@ -87,7 +89,6 @@ def _hande_statistics(params: RequestData, stat) -> str:
             all_vacancies=all_vacs,
             no_exp_vacancies=no_exp_vac,
         )
-    
     else:
 
         comparison = stat['comparison']['in_percent']
@@ -96,11 +97,13 @@ def _hande_statistics(params: RequestData, stat) -> str:
                 language=language,
                 result=abs(comparison),
             )
+
         elif comparison < 0:
             return text.MessageReply.VACS_DECREASED.substitute(
                 language=language,
                 result=abs(comparison),
             )
+
         else:
             return text.MessageReply.VACS_NO_CHANGE
 
