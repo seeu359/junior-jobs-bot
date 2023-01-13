@@ -54,7 +54,7 @@ def make_params_from_request(data: Dict[str, str]) \
 def get_statistics(request_params: RequestData) -> str:
 
     _statistics = _Statistics(request_params).stat
-    response = _hande_statistics(request_params, _statistics)
+    response = _handle_statistics(request_params, _statistics)
 
     return response
 
@@ -67,6 +67,9 @@ def _handle_params(param: str) -> str:
         'right now': 'today',
         'per week': 'week',
         'per month': 'month',
+        'per 3 month': 'month',
+        'per 6 month': 'month',
+        'per year': 'month',
     }
 
     compare_type = mapper.get(normalize_param)
@@ -76,7 +79,7 @@ def _handle_params(param: str) -> str:
     return compare_type.replace(' ', '')
 
 
-def _hande_statistics(params: RequestData, stat) -> str:
+def _handle_statistics(params: RequestData, stat) -> str:
 
     language = stat['language'].capitalize()
 
