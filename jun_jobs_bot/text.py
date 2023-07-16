@@ -18,7 +18,7 @@ class MessageReply:
     ADMIN_START = "Make a general request?"
     REQUEST_MADE = "The request has already been made today!"
     HAVE_NO_DATE = "Today's data has not yet been uploaded"
-    DATA_DOWNLOADED_SUCCESS = "The data was successfully uploaded to the " "database"
+    DATA_DOWNLOADED_SUCCESS = "The data was successfully uploaded to the database"
     TODAY_STAT = Template(
         "$language vacancies are currently: $all_vacancies.\n"
         "Of these jobs, there are no experience requirements: "
@@ -27,7 +27,7 @@ class MessageReply:
 
     VACS_NO_CHANGE = "The number of vacancies has not changed"
 
-    VACS_DECREASED = Template("The number of $language jobs decreased by " "$result%")
+    VACS_DECREASED = Template("The number of $language jobs decreased by $result%")
 
     VACS_INCREASED = Template(
         "The number of $language vacancies has increased by $result%"
