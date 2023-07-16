@@ -19,20 +19,14 @@ class Condition(StatesGroup):
 async def get_language(message: types.Message):
 
     kb_client = buttons.get_lang_buttons()
-
     await message.reply(MessageReply.SELECT_LANG, reply_markup=kb_client)
-
     await Condition.language.set()
 
 
 async def get_compare_type(message: types.Message, state: FSMContext):
-
     kb_client = buttons.get_stats_buttons()
-
     await state.update_data(language=message.text)
-
     await message.answer(MessageReply.COMPARE, reply_markup=kb_client)
-
     await Condition.next()
 
 

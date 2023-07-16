@@ -1,5 +1,6 @@
 lint:
 	poetry run flake8 jun_jobs_bot
+	poetry run black . --check
 
 test:
 	poetry run pytest tests
