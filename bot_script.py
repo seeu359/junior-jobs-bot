@@ -10,9 +10,9 @@ from loguru import logger
 def main():
     register_primary_handlers(bot.dp)
     register_info_handlers(bot.dp)
-    logger.info('Bot started!')
+    logger.info("Bot started!")
     executor.start_polling(bot.dp, skip_updates=True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

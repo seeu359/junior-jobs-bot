@@ -15,22 +15,24 @@ from jun_jobs_bot.handlers.primary_handler import (
 class TestBot(unittest.IsolatedAsyncioTestCase):
     async def test_help_handler(self):
         requester = Requester(request_handler=MessageHandler(get_help))
-        message = MESSAGE.as_object(text='Hello')
+        message = MESSAGE.as_object(text="Hello")
         calls = await requester.query(message)
         answer_message = calls.send_message.fetchone().text
         self.assertEqual(answer_message, text.MessageReply.HELP)
 
     async def test_info_handler(self):
         requester = Requester(
-            request_handler=MessageHandler(get_info, commands=['info']))
-        message = MESSAGE.as_object(text='/info')
+            request_handler=MessageHandler(get_info, commands=["info"])
+        )
+        message = MESSAGE.as_object(text="/info")
         calls = await requester.query(message)
         answer_message = calls.send_message.fetchone().text
         self.assertEqual(answer_message, text.MessageReply.INFO)
 
     async def test_get_lang_handler(self):
         requester = Requester(
-            request_handler=MessageHandler(get_language, commands=["start"]))
+            request_handler=MessageHandler(get_language, commands=["start"])
+        )
 
         message = MESSAGE.as_object(text="/start")
         calls = await requester.query(message)
@@ -40,10 +42,10 @@ class TestBot(unittest.IsolatedAsyncioTestCase):
 
     async def test_get_compare_type_handler(self):
         requester = Requester(
-            request_handler=MessageHandler(get_compare_type,
-                                           state=Condition.language))
+            request_handler=MessageHandler(get_compare_type, state=Condition.language)
+        )
 
-        message = MESSAGE.as_object(text='Python')
+        message = MESSAGE.as_object(text="Python")
         calls = await requester.query(message)
         answer_message = calls.send_message.fetchone().text
         self.assertEqual(answer_message, text.MessageReply.COMPARE)
